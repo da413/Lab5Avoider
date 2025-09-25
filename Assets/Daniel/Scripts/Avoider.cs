@@ -12,7 +12,14 @@ public class Avoider : MonoBehaviour
     public float speed;
 
     Vector3 dirFromAvoidee;
+    float magnitudeFromAvoidee;
     float dotProd;
+
+    public Transform point;
+
+    public static List<Transform> hidingPoints = new List<Transform>();
+
+    public PoissonDiscSampler sampler;
 
     //some way to toggle gizmos 
     private void Awake()
@@ -26,23 +33,47 @@ public class Avoider : MonoBehaviour
            // Debug.Log("There is a nav mesh component");
         }
 
-        
-        
+        sampler = new PoissonDiscSampler(3, 4, 0.3f);
+       
+        StartCoroutine(SpawnPoisson());
     }
 
 
     private void Update()
     {
         transform.LookAt(Avoidee.transform.position);
-
-        /*
         dirFromAvoidee = (Avoidee.transform.position - transform.position).normalized;
-        dotProd = Vector3.Dot(dirFromAvoidee, transform.forward);
-       */
+        magnitudeFromAvoidee = (Avoidee.transform.position - transform.position).magnitude;
+       
         
+        isinRange();
+        
+        
+        //dotProd = Vector3.Dot(dirFromAvoidee, transform.forward);
+            
     }
 
+    IEnumerator SpawnPoisson()
+    {
+        yield return new WaitUntil(isinRange);
+        
+        foreach(Vector2 sample in sampler.Samples())
+            {
+                Instantiate(point, new Vector3(sample.x, 0, sample.y), Quaternion.identity);
+            }
 
+    }
 
+    bool isinRange()
+    {
+        if(magnitudeFromAvoidee <= 5)
+        {
+            return true;
+        }else{
+            return false;
+        }
 
+    }
 }
+
+
