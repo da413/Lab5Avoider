@@ -273,7 +273,7 @@ GameObject:
   - component: {fileID: 548653322}
   - component: {fileID: 548653321}
   - component: {fileID: 548653326}
-  - component: {fileID: 548653325}
+  - component: {fileID: 548653327}
   m_Layer: 0
   m_Name: Avoider
   m_TagString: Untagged
@@ -369,24 +369,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &548653325
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 548653320}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efd0397641a28944db5c9cd34077995b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  avoidee: {fileID: 1918612182}
-  avoidRange: 100
-  moveSpeed: 10
-  visualize: 1
-  regionSize: {x: 50, y: 50}
-  radius: 5
 --- !u!195 &548653326
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -409,6 +391,24 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &548653327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 548653320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 452469235, guid: feb91bac519ce594a91f52387054f97c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  avoidee: {fileID: 1918612182}
+  avoidRange: 50
+  moveSpeed: 10
+  visualize: 1
+  regionSize: {x: 50, y: 50}
+  radius: 3
 --- !u!1 &1332739132
 GameObject:
   m_ObjectHideFlags: 0
