@@ -7,54 +7,125 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Avoider : MonoBehaviour
 {
-    public NavMeshAgent navMeshAgent;
-    public GameObject Avoidee;
+    [Header("Avoidance Settings")]
+    public GameObject avoidee;
     public float avoidRange = 5f;
     public float moveSpeed = 10f;
-    private bool seenByPlayer = false;
+    public bool visualize = true;
+
+    [Header("Poisson Disc Settings")]
+    public Vector2 regionSize = new Vector2(20, 20);
+    public float radius = 3f;
+    private NavMeshAgent navMeshAgent;
+    private List<Vector2> candidateSpots = new List<Vector2>();
+
+    private void Awake()
+    {
+        navMeshAgent = GetComponent<NavMeshAgent>();
+    }
 
     private void Start()
     {
-        navMeshAgent = this.GetComponent<NavMeshAgent>();
+        StartCoroutine(AvoidanceLoop());
     }
-    // Update is called once per frame
-    void Update()
-    {
-        if (CheckPointVisibility(transform.position))
-        {
-            if ()
-            {
 
+    private IEnumerator AvoidanceLoop()
+    {
+        while (true)
+        {
+            if (avoidee != null)
+            {
+                if (CanSeeMe(avoidee.transform))
+                {
+                    FindCandidateSpots();
+
+                    if (candidateSpots.Count > 0)
+                    {
+                        Vector3 bestSpot = GetClosestSpot(candidateSpots);
+                        navMeshAgent.SetDestination(bestSpot);
+                    }
+                }
+            }
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    private void FindCandidateSpots()
+    {
+        candidateSpots.Clear();
+
+        PoissonDiscSampler sampler = new PoissonDiscSampler(regionSize.x, regionSize.y, radius);
+
+        foreach (Vector2 sample in sampler.Samples())
+        {
+            Vector3 worldPoint = new Vector3(
+                sample.x - regionSize.x / 2f + transform.position.x,
+                transform.position.y,
+                sample.y - regionSize.y / 2f + transform.position.z
+                );
+
+            if (!IsVisibleToAvoidee(worldPoint))
+            {
+                candidateSpots.Add(new Vector2(worldPoint.x, worldPoint.z));
+
+                if (visualize)
+                {
+                    Debug.DrawLine(transform.position, worldPoint, Color.green, 0.5f);
+                }
+            }
+            else
+            {
+                if (visualize)
+                {
+                    Debug.DrawLine(transform.position, worldPoint, Color.red, 0.5f);
+                }
             }
         }
     }
 
-    void FindSpot(float size_x, float size_y, float cellSize)
+    private Vector3 GetClosestSpot(List<Vector2> spots)
     {
-        var sampler = new PoissonDiscSampler(size_x, size_y, cellSize);
-        List<Vector2> hidingCandidates = new List<Vector2>();
+        Vector3 closest = transform.position;
 
-        foreach (var point in sampler.Samples())
+        float minDistance = Mathf.Infinity;
+
+        foreach (Vector2 spot in spots)
         {
+            Vector3 worldPoint = new Vector3(spot.x, transform.position.y, spot.y);
+            float distance = Vector3.Distance(transform.position, worldPoint);
 
-        }
-
-        foreach (var point in sampler.Samples())
-        {
-            if (!CheckPointVisibility(point, ))
+            if (distance < minDistance)
             {
-                hidingCandidates.Add(point);
+                minDistance = distance;
+                closest = worldPoint;
             }
         }
+
+        return closest;
     }
 
-    private bool CheckPointVisibility(Vector2 point)
+    private bool CanSeeMe(Transform target)
     {
-
-        if ()
+        Vector3 direction = transform.position - target.position;
+        if (Physics.Raycast(target.position, direction.normalized, out RaycastHit hit, avoidRange))
         {
-            seenByPlayer = false;
+            return hit.transform == transform;
         }
-        return seenByPlayer;
+        return false;
+    }
+
+    private bool IsVisibleToAvoidee(Vector3 point)
+    {
+        Vector3 direction = point - avoidee.transform.position;
+
+        if (Physics.Raycast(avoidee.transform.position, direction.normalized, out RaycastHit hit, avoidRange))
+        {
+            if (hit.point != point && hit.collider.transform != this.transform)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
