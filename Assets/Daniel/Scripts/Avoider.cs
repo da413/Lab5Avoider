@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -7,6 +8,7 @@ using UnityEngine.AI;
 
 public class Avoider : MonoBehaviour
 {
+    private NavMeshAgent agent;
     public GameObject Avoidee;
     public float range;
     public float speed;
@@ -15,9 +17,13 @@ public class Avoider : MonoBehaviour
     float magnitudeFromAvoidee;
     float dotProd;
 
-    public Transform point;
+    public Point point;
+    private Point pointInst;
+    private Point closestPoint;
+    private float distanceFromPoint;
 
-    public static List<Transform> hidingPoints = new List<Transform>();
+    public static List<Point> PointsList = new List<Point>();
+
 
     public PoissonDiscSampler sampler;
 
@@ -30,12 +36,24 @@ public class Avoider : MonoBehaviour
         }
         else
         {
-           // Debug.Log("There is a nav mesh component");
+            agent = this.gameObject.GetComponent<NavMeshAgent>();
+            agent.speed = speed;
         }
 
-        sampler = new PoissonDiscSampler(3, 4, 0.3f);
-       
-        StartCoroutine(SpawnPoisson());
+        sampler = new PoissonDiscSampler(5, 5, 0.3f);
+
+
+
+        foreach (Vector2 sample in sampler.Samples())
+        {
+            pointInst = Instantiate(point, new Vector3(sample.x, 0, sample.y), Quaternion.identity);
+            PointsList.Add(pointInst);
+
+        }
+
+        //distanceFromPoint = (transform.position - pointInst.transform.position).magnitude;
+
+
     }
 
 
@@ -44,36 +62,40 @@ public class Avoider : MonoBehaviour
         transform.LookAt(Avoidee.transform.position);
         dirFromAvoidee = (Avoidee.transform.position - transform.position).normalized;
         magnitudeFromAvoidee = (Avoidee.transform.position - transform.position).magnitude;
+
+
+        dotProd = Vector3.Dot(dirFromAvoidee, transform.forward);
+
+        if (dotProd > 0.9) //the avoider can see the avoidee
+        {
+
+            for (int i = 0; i < PointsList.Count; i++) //search through point list
+            {
+
+                if (!PointsList[i].isVisible) //if a point gameobject not visible to the avoidee
+                {
+
+                    float closestDistance = 1000;
+                    if (PointsList[i].distanceFromAvoider < closestDistance)
+                    {
+                        closestDistance = PointsList[i].distanceFromAvoider; //find the the point with the minimum distance
+
+                    }
+                    
+                }
+            }
+        }
        
         
-        isinRange();
         
-        
-        //dotProd = Vector3.Dot(dirFromAvoidee, transform.forward);
-            
-    }
 
-    IEnumerator SpawnPoisson()
-    {
-        yield return new WaitUntil(isinRange);
         
-        foreach(Vector2 sample in sampler.Samples())
-            {
-                Instantiate(point, new Vector3(sample.x, 0, sample.y), Quaternion.identity);
-            }
 
     }
 
-    bool isinRange()
-    {
-        if(magnitudeFromAvoidee <= 5)
-        {
-            return true;
-        }else{
-            return false;
-        }
+    
 
-    }
+
 }
 
 

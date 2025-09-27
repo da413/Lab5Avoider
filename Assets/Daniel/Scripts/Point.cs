@@ -2,36 +2,55 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Point: MonoBehaviour
+public class Point : MonoBehaviour
 {
-    [SerializeField] GameObject Avoidee;
-    LayerMask Layer;
-    
-    
-    RaycastHit hitInfo;
+    public GameObject avoidee;
+    public GameObject avoider;
+    public RaycastHit hitInfo;
 
-    void Start()
+
+    LayerMask layer;
+
+    public float distanceFromAvoider { get; private set; }
+    public bool isVisible { get; private set; }
+    void Awake()
     {
-        Layer = LayerMask.GetMask("Default", "Avoidee");
+        layer = LayerMask.GetMask("Default", "Avoidee");
+        distanceFromAvoider = (avoider.transform.position - transform.position).magnitude; //used to find the closest point for avoider
     }
-
     void Update()
     {
-        transform.LookAt(Avoidee.transform.position); 
-        float mag = (Avoidee.transform.position - transform.position).magnitude;
+        transform.LookAt(avoidee.transform.position); //look at avoidee
+        Vector3 distanceFromAvoidee = avoidee.transform.position - transform.position;
+        float magnitudeFromAvoidee = distanceFromAvoidee.magnitude; //estimate distance from avoidee
 
-        bool hit = Physics.Raycast(transform.position, transform.forward, out hitInfo, mag, Layer);
-
-        if(hit)
+        if (Physics.Raycast(transform.position, transform.forward, out hitInfo, layer))
         {
-            //Debug.Log(hitInfo.collider.gameObject.name);
-            if(hitInfo.collider.gameObject.name != "Avoidee") //this point can't see avoidee
-            {
-                Avoider.hidingPoints.Add(this.transform);
-                Debug.Log(Avoider.hidingPoints.Count);
-            }
+            StartCoroutine(IsVisibleCoroutine(hitInfo.collider));
+
         }
+    }//the point can see the player
+
+    IEnumerator IsVisibleCoroutine(Collider collider)
+    {
+        if (collider != avoidee.GetComponent<Collider>())
+        {
+
+            isVisible = false;
+           // Debug.Log(isVisible);
+        }
+        else
+        {
+            isVisible = true;
+          //  Debug.Log(isVisible);
+        }
+        yield return null;
     }
 
-   
-}
+}    
+
+    
+
+
+
+

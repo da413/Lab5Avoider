@@ -272,7 +272,7 @@ GameObject:
   - component: {fileID: 716355587}
   - component: {fileID: 716355586}
   - component: {fileID: 716355585}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Avoidee
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -393,7 +393,7 @@ Transform:
   m_GameObject: {fileID: 1068324531}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.002348905, w: 0.99999726}
-  m_LocalPosition: {x: 0.51, y: 0, z: -3.46}
+  m_LocalPosition: {x: 0.51, y: 0, z: -3.35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -411,7 +411,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7f4bcce15c457b4a9bac1d90ede69ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Avoidee: {fileID: 716355584}
+  avoidee: {fileID: 716355584}
+  avoider: {fileID: 2031353482}
 --- !u!1 &1332739132
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,7 +716,6 @@ GameObject:
   - component: {fileID: 2031353486}
   - component: {fileID: 2031353485}
   - component: {fileID: 2031353484}
-  - component: {fileID: 2031353488}
   - component: {fileID: 2031353489}
   m_Layer: 0
   m_Name: Avoider
@@ -812,23 +812,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2031353488
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2031353482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf10efd7b7c587e4cb3bfea1921e595c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Avoidee: {fileID: 716355584}
-  range: 5
-  speed: 0
-  point: {fileID: 1068324534}
-  hidingPoints: []
 --- !u!195 &2031353489
 NavMeshAgent:
   m_ObjectHideFlags: 0
